@@ -65,6 +65,7 @@ $months = ["January", "February", "March", "April", "May", "June", "July", "Augu
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive Payment Calendar</title>
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -79,8 +80,55 @@ $months = ["January", "February", "March", "April", "May", "June", "July", "Augu
         .overdue { background-color: red; }
         .postponed { background-color: purple; }
         .calendar { width: 90%; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px #ccc; display: none; }
-        .day { width: 14.28%; height: 100px; display: inline-block; border: 1px solid #ddd; vertical-align: top; position: relative; cursor: pointer; }
-        .day span { position: absolute; top: 5px; left: 5px; font-weight: bold; }
+        .day {
+        width: 14.28%;
+        height: auto; /* Allow dynamic height based on content */
+        min-height: 120px;
+        display: inline-block;
+        align-items: flex-start;
+        justify-content: flex-start;
+        border: 1px solid #ddd;
+        vertical-align: top;
+        position: relative;
+        cursor: pointer;
+        padding: 4px;
+        box-sizing: border-box;
+        overflow: hidden;
+        word-wrap: break-word;
+}
+        .day span { background:deepskyblue; display:block; font-size: 14px; margin-bottom: 6px; font-weight: bold; }
+        .status-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+            text-align: center;
+            color: white;
+            font-size: 10px;
+            line-height: 16px;
+            vertical-align: middle;
+    }
+    .status-badge {
+            flex: 0 1 48%; /* Allow two per row, wrap to next line */
+            height: auto;
+            padding: 4px 6px;
+            margin: 2px;
+            border-radius: 6px;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            text-align: center;
+            box-sizing: border-box;
+            word-wrap: break-word;
+            white-space: normal;
+            line-height: 1.2;
+}
+
+        .paid { background-color: green; }
+        .pending { background-color: orange; }
+        .overdue { background-color: red; }
+        .postponed { background-color: purple; }
     </style>
 </head>
 <body>
@@ -109,7 +157,7 @@ $months = ["January", "February", "March", "April", "May", "June", "July", "Augu
 
     <!-- Payment Details Modal -->
     <div class="modal fade" id="paymentModal" tabindex="-1">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Payment Details</h5>
@@ -122,55 +170,125 @@ $months = ["January", "February", "March", "April", "May", "June", "July", "Augu
 
     <script>
         function loadCalendar(month) {
-            $.getJSON('fetch_payments.php?month=' + month, function(data) {
-                let daysInMonth = new Date(2025, month, 0).getDate();
-                let firstDay = new Date(2025, month - 1, 1).getDay();
-                let calendarHtml = '<h3>' + ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][month - 1] + '</h3>';
-                let dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    $.getJSON('fetch_payments.php?month=' + month, function(data) {
+        let daysInMonth = new Date(2025, month, 0).getDate();
+        let firstDay = new Date(2025, month - 1, 1).getDay();
+        let calendarHtml = '<h3>' + 
+            ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][month - 1] +
+            '</h3>';
+        let dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-                calendarHtml += '<div style="display:flex;justify-content:center;">';
-                dayNames.forEach(d => {
-                    calendarHtml += '<div class="day" style="font-weight:bold; background:#ddd; width:14.28%; text-align:center;">' + d + '</div>';
-                });
-                calendarHtml += '</div>';
+        calendarHtml += '<div style="display:flex;justify-content:center;">';
+        dayNames.forEach(d => {
+            calendarHtml += '<div class="day" style="font-weight:bold; background:#ddd; width:14.28%; text-align:center;">' + d + '</div>';
+        });
+        calendarHtml += '</div>';
 
-                for (let d = 0; d < firstDay; d++) {
-                    calendarHtml += '<div class="day"></div>';
+        for (let d = 0; d < firstDay; d++) {
+            calendarHtml += '<div class="day"></div>';
+}
+
+        for (let d = 1; d <= daysInMonth; d++) {
+            let paymentsForDay = data.filter(p => new Date(p.DueDate).getDate() == d);
+            let statusCounts = {
+                Paid: 0,
+                Pending: 0,
+                Overdue: 0,
+                Postponed: 0
+            };
+
+            paymentsForDay.forEach(p => {
+                statusCounts[p.Status]++;
+            });
+
+            let badgeHtml = '';
+            for (let status in statusCounts) {
+                if (statusCounts[status] > 0) {
+                    badgeHtml += `<div class="status-badge ${status.toLowerCase()}">${status}: ${statusCounts[status]}</div>`;
+                }
+            }
+
+            calendarHtml += `<div class="day" onclick="showPayments(${d}, ${month})">
+                <span>${d}</span>
+                <div class="badge-wrapper" style="display: inline-table; flex-wrap: wrap; justify-content: space-between; width: 100%;">${badgeHtml}</div>
+
+            </div>`;
+}
+
+
+        $('#monthlyOverview').hide();
+        $('#backToOverview').show();
+        $('#calendar').html(calendarHtml).fadeIn();
+    });
+}
+
+
+function showPayments(day, month) {
+    const monthNames = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+
+    $.getJSON('fetch_payments.php?month=' + month, function(data) {
+        let paymentsForDay = data.filter(p => new Date(p.DueDate).getDate() == day);
+        
+        let details = `
+            <div class="text-center mb-4">
+                <h5 class="mb-0">Payments for</h5>
+                <h4><strong>${monthNames[month - 1]}</strong><br><strong>${day}</strong></h4>
+            </div>
+        `;
+
+        if (paymentsForDay.length === 0) {
+            details += `<p class="text-center text-muted">No payments scheduled for this day.</p>`;
+        } else {
+            details += '<div class="row">'; // Start of the horizontal layout container
+
+            paymentsForDay.forEach(p => {
+                let recurringText = p.IsRecurring ? `<span class="badge bg-info">Recurring</span>` : '';
+                let statusColor = '';
+                let statusText = '';
+
+                // Set status color and text based on payment status
+                if (p.Status === "Paid") {
+                    statusColor = "success";
+                    statusText = "Paid";
+                } else if (p.Status === "Pending") {
+                    statusColor = "warning";
+                    statusText = "Pending";
+                } else if (p.Status === "Overdue") {
+                    statusColor = "danger";
+                    statusText = "Overdue";
+                } else if (p.Status === "Postponed") {
+                    statusColor = "postponed";
+                    statusText = "Postponed";
                 }
 
-                for (let d = 1; d <= daysInMonth; d++) {
-                    let statusDots = '';
-                    let paymentsForDay = data.filter(p => new Date(p.DueDate).getDate() == d);
-
-                    paymentsForDay.forEach(p => {
-                        statusDots += `<span class="status-dot ${p.Status.toLowerCase()}"></span>`;
-                    });
-
-                    calendarHtml += `<div class="day" onclick="showPayments(${d}, ${month})">
-                        <span>${d}</span>
-                        ${statusDots}
-                    </div>`;
-                }
-
-                $('#monthlyOverview').hide();
-                $('#backToOverview').show();
-                $('#calendar').html(calendarHtml).fadeIn();
+                details += `
+                    <div class="col-md-4 mb-3">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title mb-2">${p.PaymentName} ${recurringText}</h5>
+                                <p class="mb-1"><strong>Status:</strong> <span class="badge bg-${statusColor}">${statusText}</span></p>
+                                <p class="mb-1"><strong>Category:</strong> ${p.Category}</p>
+                                <p class="mb-1"><strong>Location:</strong> ${p.Location}</p>
+                                <p class="mb-1"><strong>Amount:</strong> ₱${p.Price}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
             });
+
+            details += '</div>'; // End of the row
         }
 
-        function showPayments(day, month) {
-            $.getJSON('fetch_payments.php?month=' + month, function(data) {
-                let details = `<b>Payments for ${day}:</b><br>`;
-                let paymentsForDay = data.filter(p => new Date(p.DueDate).getDate() == day);
+        $('#paymentInfo').html(details);
+        $('#paymentModal').modal('show');
+    });
+}
 
-                paymentsForDay.forEach(p => {
-                    details += `<hr><b>${p.PaymentName}</b><br>Status: ${p.Status}<br>`;
-                });
 
-                $('#paymentInfo').html(details);
-                $('#paymentModal').modal('show');
-            });
-        }
+
 
         function goBack() {
             $('#calendar').hide();
