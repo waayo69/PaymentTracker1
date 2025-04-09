@@ -1,8 +1,8 @@
 <?php
-$serverName = "sql.bsite.net\MSSQL2016";
-$database = "waayo69_Clients";
-$username = "waayo69_Clients";
-$password = "kris123asd";
+$serverName = "db17019.public.databaseasp.net";
+$database = "db17019";
+$username = "db17019";
+$password = "Y+p5h4?X6Fk!";
 
 // Connection to MS SQL Server
 try {

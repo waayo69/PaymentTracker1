@@ -20,34 +20,29 @@ foreach ($payments as $payment) {
     // Add original payment
     $allPayments[] = $payment;
 
-    // Generate future occurrences for Paid recurring payments within the selected month + 1 month for potential next occurrence
+    // Generate future occurrences for Paid recurring payments
     if ($status == 'Paid' && !empty($recurringType)) {
         $nextDueDate = clone $dueDate;
-        $limitDate = new DateTime();
-        $limitDate->modify('+' . (date('n') == $selectedMonth ? 1 : 2) . ' months')->modify('last day of this month'); // Extend limit slightly
+        switch ($recurringType) {
+            case "Weekly":
+                $nextDueDate->modify('+1 week');
+                break;
+            case "Monthly":
+                $nextDueDate->modify('+1 month');
+                break;
+            case "Quarterly":
+                $nextDueDate->modify('+3 months');
+                break;
+            case "Annually":
+                $nextDueDate->modify('+1 year');
+                break;
+        }
 
-        while ($nextDueDate <= $limitDate) {
-            switch ($recurringType) {
-                case "Weekly":
-                    $nextDueDate->modify('+1 week');
-                    break;
-                case "Monthly":
-                    $nextDueDate->modify('+1 month');
-                    break;
-                case "Quarterly":
-                    $nextDueDate->modify('+3 months');
-                    break;
-                case "Annually":
-                    $nextDueDate->modify('+1 year');
-                    break;
-            }
-
-            if ($nextDueDate->format('n') == $selectedMonth) {
-                $futurePayment = $payment;
-                $futurePayment['DueDate'] = $nextDueDate->format('Y-m-d');
-                $allPayments[] = $futurePayment;
-            }
-            if ($nextDueDate <= new DateTime($payment['DueDate'])) break; // Avoid infinite loops
+        // Add future occurrence if it's within the selected month
+        if ($nextDueDate->format('n') == $selectedMonth) {
+            $futurePayment = $payment;
+            $futurePayment['DueDate'] = $nextDueDate->format('Y-m-d');
+            $allPayments[] = $futurePayment;
         }
     }
 }
@@ -67,17 +62,75 @@ $months = ["January", "February", "March", "April", "May", "June", "July", "Augu
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width-device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive Payment Calendar</title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f8f9fa; text-align: center; }
+        .month-box { display: inline-block; width: 200px; height: 160px; margin: 10px; padding: 15px; background: #fff; border-radius: 10px; box-shadow: 2px 2px 10px #ccc; cursor: pointer; text-align: left; }
+        .month-box h4 { margin-bottom: 5px; }
+        .status-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+        .paid { background-color: green; }
+        .pending { background-color: orange; }
+        .overdue { background-color: red; }
+        .postponed { background-color: purple; }
+        .calendar { width: 90%; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px #ccc; display: none; }
+        .day {
+        width: 14.28%;
+        height: auto; /* Allow dynamic height based on content */
+        min-height: 120px;
+        display: inline-block;
+        align-items: flex-start;
+        justify-content: flex-start;
+        border: 1px solid #ddd;
+        vertical-align: top;
+        position: relative;
+        cursor: pointer;
+        padding: 4px;
+        box-sizing: border-box;
+        overflow: hidden;
+        word-wrap: break-word;
+}
+        .day span { background:deepskyblue; display:block; font-size: 14px; margin-bottom: 6px; font-weight: bold; }
+        .status-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+            text-align: center;
+            color: white;
+            font-size: 10px;
+            line-height: 16px;
+            vertical-align: middle;
+    }
+    .status-badge {
+            flex: 0 1 48%; /* Allow two per row, wrap to next line */
+            height: auto;
+            padding: 4px 6px;
+            margin: 2px;
+            border-radius: 6px;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            text-align: center;
+            box-sizing: border-box;
+            word-wrap: break-word;
+            white-space: normal;
+            line-height: 1.2;
+}
 
+        .paid { background-color: green; }
+        .pending { background-color: orange; }
+        .overdue { background-color: red; }
+        .postponed { background-color: purple; }
+    </style>
 </head>
 <body>
 
@@ -88,127 +141,100 @@ $months = ["January", "February", "March", "April", "May", "June", "July", "Augu
     <div class="w-100 text-center">
         <h1 class="mb-0">Payment Tracker</h1>
     </div>
-    <div class="position-absolute end-0 me-5">
+    <div class="position-absolute end-0 me-5"> <!-- Moved bell slightly left using me-3 -->
         <button class="btn btn-outline-secondary position-relative" type="button" id="notifBell" data-bs-toggle="collapse" data-bs-target="#notificationPanel" aria-expanded="false" aria-controls="notificationPanel">
             <i class="fas fa-bell"></i>
-            <?php
-            $today = date('Y-m-d');
-            $endOfWeek = date('Y-m-d', strtotime('next Sunday'));
-            $firstOfMonth = date('Y-m-01');
-            $lastOfMonth = date('Y-m-t');
-
-            $stmtPending = $conn->prepare("SELECT COUNT(ID) FROM Payments1 WHERE Status = 'Pending' AND DueDate BETWEEN ? AND ?");
-            $stmtPending->execute([$today, $endOfWeek]);
-            $pendingCount = $stmtPending->fetchColumn();
-
-            $stmtOverdue = $conn->prepare("SELECT COUNT(ID) FROM Payments1 WHERE Status = 'Overdue' AND DueDate <= ?");
-            $stmtOverdue->execute([$today]);
-            $overdueCount = $stmtOverdue->fetchColumn();
-
-            $stmtPostponed = $conn->prepare("SELECT COUNT(ID) FROM Payments1 WHERE Status = 'Postponed' AND DueDate BETWEEN ? AND ?");
-            $stmtPostponed->execute([$firstOfMonth, $lastOfMonth]);
-            $postponedCount = $stmtPostponed->fetchColumn();
-
-            $totalNotifications = $pendingCount + $overdueCount + $postponedCount;
-
-            if ($totalNotifications > 0) {
-                echo "<span class='position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger'>$totalNotifications</span>";
-            }
-            ?>
+            
         </button>
 
+        <!-- Notification Vertical Scroll Menu -->
         <div id="notificationPanel" class="collapse position-absolute end-0 mt-2 border border-secondary rounded bg-white shadow p-3" style="width: 500px; max-height: 600px; overflow-y: auto; z-index: 1050;">
             <ul class="list-unstyled mb-0">
                 <li><strong>🔔 Notifications</strong></li>
                 <li><hr></li>
-                <?php
-                $today = date('Y-m-d');
-                $endOfWeek = date('Y-m-d', strtotime('next Sunday'));
-                $firstOfMonth = date('Y-m-01');
-                $lastOfMonth = date('Y-m-t');
-                ?>
 
                 <li><strong>🕓 Pending This Week</strong></li>
                 <?php
-                $stmt = $conn->prepare("SELECT ID, PaymentName, DueDate, Price, Location, Category, Recurring, Status FROM Payments1 WHERE Status = 'Pending' AND DueDate BETWEEN ? AND ? ORDER BY DueDate ASC");
+                $today = date('Y-m-d');
+                $endOfWeek = date('Y-m-d', strtotime('next Sunday'));
+                $stmt = $conn->prepare("SELECT ID, PaymentName, DueDate, Price, Location, Category, Recurring, Status FROM Payments1 WHERE Status = 'Pending' AND DueDate BETWEEN ? AND ?");
                 $stmt->execute([$today, $endOfWeek]);
                 $pendingWeek = $stmt->fetchAll();
                 if ($pendingWeek) {
                     foreach ($pendingWeek as $row) {
-                        $timestamp = date('Y-m-d H:i:s');
-                        echo "<li class='notification-card' id='notification-".$row['ID']."'>
-                                <div class='notification-header'>
-                                    <i class='fas fa-clock'></i>
-                                    <h6 class='notification-title'>{$row['PaymentName']} - Due: {$row['DueDate']}</h6>
-                                </div>
-                                <div class='notification-body'>
-                                    Price: \$" . number_format($row['Price'], 2) . "<br>
-                                    Location: {$row['Location']}<br>
-                                    Category: {$row['Category']}<br>
-                                    Recurring: " . ($row['Recurring'] ? 'Yes' : 'No') . "<br>
-                                    Status: {$row['Status']}<br>
-                                    Due Date: {$row['DueDate']}<br>
-                                    <span class='notification-timestamp'>Received: {$timestamp}</span>
-                                </div>
-                            </li>";
+                        echo "<li>
+                            <a class='text-muted d-block' data-bs-toggle='collapse' href='#payment{$row['ID']}' role='button' aria-expanded='false' aria-controls='payment{$row['ID']}'>
+                                • {$row['PaymentName']} - Due: {$row['DueDate']}
+                            </a>
+                            <div class='collapse' id='payment{$row['ID']}'>
+                                <ul class='ms-3'>
+                                    <li>Price: \$" . number_format($row['Price'], 2) . "</li>
+                                    <li>Location: {$row['Location']}</li>
+                                    <li>Category: {$row['Category']}</li>
+                                    <li>Recurring: " . ($row['Recurring'] ? 'Yes' : 'No') . "</li>
+                                    <li>Status: {$row['Status']}</li>
+                                    <li>Due Date: {$row['DueDate']}</li>
+                                </ul>
+                            </div>
+                        </li>";
                     }
                 } else {
                     echo "<li class='small text-muted ms-3'>No pending payments this week.</li>";
                 }
                 ?>
 
-                <li class="mt-2"><strong>⚠️ Overdue</strong></li>
+                <li class="mt-2"><strong>⚠️ Overdue This Month</strong></li>
                 <?php
-                $stmt = $conn->prepare("SELECT ID, PaymentName, DueDate, Price, Location, Category, Recurring, Status FROM Payments1 WHERE Status = 'Overdue' AND DueDate <= ? ORDER BY DueDate ASC");
-                $stmt->execute([$today]);
+                $firstOfMonth = date('Y-m-01');
+                $lastOfMonth = date('Y-m-t');
+                $stmt = $conn->prepare("SELECT ID, PaymentName, DueDate, Price, Location, Category, Recurring, Status FROM Payments1 WHERE Status = 'Overdue' AND DueDate BETWEEN ? AND ?");
+                $stmt->execute([$firstOfMonth, $lastOfMonth]);
                 $overdueMonth = $stmt->fetchAll();
                 if ($overdueMonth) {
                     foreach ($overdueMonth as $row) {
-                        $timestamp = date('Y-m-d H:i:s');
-                        echo "<li class='notification-card' id='notification-".$row['ID']."'>
-                                <div class='notification-header'>
-                                    <i class='fas fa-exclamation-triangle'></i>
-                                    <h6 class='notification-title'>{$row['PaymentName']} - Due: {$row['DueDate']}</h6>
-                                </div>
-                                <div class='notification-body'>
-                                    Price: \$" . number_format($row['Price'], 2) . "<br>
-                                    Location: {$row['Location']}<br>
-                                    Category: {$row['Category']}<br>
-                                    Recurring: " . ($row['Recurring'] ? 'Yes' : 'No') . "<br>
-                                    Status: {$row['Status']}<br>
-                                    Due Date: {$row['DueDate']}<br>
-                                    <span class='notification-timestamp'>Received: {$timestamp}</span>
-                                </div>
-                            </li>";
+                        echo "<li>
+                            <a class='text-muted d-block' data-bs-toggle='collapse' href='#payment{$row['ID']}' role='button' aria-expanded='false' aria-controls='payment{$row['ID']}'>
+                                • {$row['PaymentName']} - Due: {$row['DueDate']}
+                            </a>
+                            <div class='collapse' id='payment{$row['ID']}'>
+                                <ul class='ms-3'>
+                                    <li>Price: \$" . number_format($row['Price'], 2) . "</li>
+                                    <li>Location: {$row['Location']}</li>
+                                    <li>Category: {$row['Category']}</li>
+                                    <li>Recurring: " . ($row['Recurring'] ? 'Yes' : 'No') . "</li>
+                                    <li>Status: {$row['Status']}</li>
+                                    <li>Due Date: {$row['DueDate']}</li>
+                                </ul>
+                            </div>
+                        </li>";
                     }
                 } else {
-                    echo "<li class='small text-muted ms-3'>No overdue payments.</li>";
+                    echo "<li class='small text-muted ms-3'>No overdue payments this month.</li>";
                 }
                 ?>
 
                 <li class="mt-2"><strong>📌 Postponed This Month</strong></li>
                 <?php
-                $stmt = $conn->prepare("SELECT ID, PaymentName, DueDate, Price, Location, Category, Recurring, Status FROM Payments1 WHERE Status = 'Postponed' AND DueDate BETWEEN ? AND ? ORDER BY DueDate ASC");
+                $stmt = $conn->prepare("SELECT ID, PaymentName, DueDate, Price, Location, Category, Recurring, Status FROM Payments1 WHERE Status = 'Postponed' AND DueDate BETWEEN ? AND ?");
                 $stmt->execute([$firstOfMonth, $lastOfMonth]);
                 $postponedMonth = $stmt->fetchAll();
                 if ($postponedMonth) {
                     foreach ($postponedMonth as $row) {
-                        $timestamp = date('Y-m-d H:i:s');
-                        echo "<li class='notification-card' id='notification-".$row['ID']."'>
-                                <div class='notification-header'>
-                                    <i class='fas fa-calendar-alt'></i>
-                                    <h6 class='notification-title'>{$row['PaymentName']} - Due: {$row['DueDate']}</h6>
-                                </div>
-                                <div class='notification-body'>
-                                    Price: \$" . number_format($row['Price'], 2) . "<br>
-                                    Location: {$row['Location']}<br>
-                                    Category: {$row['Category']}<br>
-                                    Recurring: " . ($row['Recurring'] ? 'Yes' : 'No') . "<br>
-                                    Status: {$row['Status']}<br>
-                                    Due Date: {$row['DueDate']} <br>
-                                    <span class='notification-timestamp'>Received: {$timestamp}</span>
-                                </div>
-                            </li>";
+                        echo "<li>
+                            <a class='text-muted d-block' data-bs-toggle='collapse' href='#payment{$row['ID']}' role='button' aria-expanded='false' aria-controls='payment{$row['ID']}'>
+                                • {$row['PaymentName']} - Due: {$row['DueDate']}
+                            </a>
+                            <div class='collapse' id='payment{$row['ID']}'>
+                                <ul class='ms-3'>
+                                    <li>Price: \$" . number_format($row['Price'], 2) . "</li>
+                                    <li>Location: {$row['Location']}</li>
+                                    <li>Category: {$row['Category']}</li>
+                                    <li>Recurring: " . ($row['Recurring'] ? 'Yes' : 'No') . "</li>
+                                    <li>Status: {$row['Status']}</li>
+                                    <li>Due Date: {$row['DueDate']}</li>
+                                </ul>
+                            </div>
+                        </li>";
                     }
                 } else {
                     echo "<li class='small text-muted ms-3'>No postponed payments this month.</li>";
@@ -219,23 +245,26 @@ $months = ["January", "February", "March", "April", "May", "June", "July", "Augu
     </div>
 </div>
 
+
     <p>Select a month to view payment details:</p>
+    <!-- Monthly Overview -->
     <div id="monthlyOverview">
         <?php
         for ($i = 1; $i <= 12; $i++) {
-            $isCurrent = ($i == date('n')) ? 'border border-primary' : '';
-            echo "<div class='month-box $isCurrent' onclick='loadCalendar($i)'>
+            echo "<div class='month-box' onclick='loadCalendar($i)'>
                     <h4>{$months[$i - 1]}</h4>
                     <span class='status-dot paid'></span> Paid: {$monthlyCounts[$i]['Paid']}<br>
                     <span class='status-dot pending'></span> Pending: {$monthlyCounts[$i]['Pending']}<br>
                     <span class='status-dot overdue'></span> Overdue: {$monthlyCounts[$i]['Overdue']}<br>
                     <span class='status-dot postponed'></span> Postponed: {$monthlyCounts[$i]['Postponed']}
-                </div>";
+                  </div>";
         }
         ?>
     </div>
+    <!-- Calendar View -->
     <div id="calendar" class="calendar"></div>
 
+    <!-- Payment Details Modal -->
     <div class="modal fade" id="paymentModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -251,22 +280,22 @@ $months = ["January", "February", "March", "April", "May", "June", "July", "Augu
     <script>
 function loadCalendar(month) {
     $.getJSON('fetch_payments.php?month=' + month, function(data) {
-        let daysInMonth = new Date(new Date().getFullYear(), month, 0).getDate();
-        let firstDay = new Date(new Date().getFullYear(), month - 1, 1).getDay();
-        let calendarHtml = '<h3>' +
+        let daysInMonth = new Date(2025, month, 0).getDate();
+        let firstDay = new Date(2025, month - 1, 1).getDay();
+        let calendarHtml = '<h3>' + 
             ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][month - 1] +
-            ' ' + new Date().getFullYear() + '</h3>';
+            '</h3>';
         let dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
         calendarHtml += '<div style="display:flex;justify-content:center;">';
         dayNames.forEach(d => {
-            calendarHtml += '<div class="day day-header" style="font-weight:bold; background:#ddd; width:14.28%; text-align:center;">' + d + '</div>';
+            calendarHtml += '<div class="day" style="font-weight:bold; background:#ddd; width:14.28%; text-align:center;">' + d + '</div>';
         });
         calendarHtml += '</div>';
 
         for (let d = 0; d < firstDay; d++) {
             calendarHtml += '<div class="day"></div>';
-        }
+}
 
         for (let d = 1; d <= daysInMonth; d++) {
             let paymentsForDay = data.filter(p => new Date(p.DueDate).getDate() == d);
@@ -288,11 +317,12 @@ function loadCalendar(month) {
                 }
             }
 
-            calendarHtml += `<div class="day day-cell" onclick="showPayments(${d}, ${month})">
-                <span class="day-number">${d}</span>
-                <div class="badge-wrapper" style="display: flex; flex-wrap: wrap; justify-content: space-between; width: 100%;">${badgeHtml}</div>
+            calendarHtml += `<div class="day" onclick="showPayments(${d}, ${month})">
+                <span>${d}</span>
+                <div class="badge-wrapper" style="display: inline-table; flex-wrap: wrap; justify-content: space-between; width: 100%;">${badgeHtml}</div>
+
             </div>`;
-        }
+}
 
 
         $('#monthlyOverview').hide();
@@ -321,24 +351,25 @@ function showPayments(day, month) {
         if (paymentsForDay.length === 0) {
             details += `<p class="text-center text-muted">No payments scheduled for this day.</p>`;
         } else {
-            details += '<div class="row">';
+            details += '<div class="row">'; // Start of the horizontal layout container
 
             paymentsForDay.forEach(p => {
-                let recurringText = p.RecurringType ? `<span class="badge bg-info">${p.RecurringType}</span>` : '';
+                let recurringText = p.IsRecurring ? `<span class="badge bg-info">Recurring</span>` : '';
                 let statusClass = '';
                 let statusText = '';
 
+                // Set status class and text based on payment status
                 if (p.Status === "Paid") {
-                    statusClass = "paid";
+                    statusClass = "paid"; // Green for Paid
                     statusText = "Paid";
                 } else if (p.Status === "Pending") {
-                    statusClass = "pending";
+                    statusClass = "pending"; // Orange for Pending
                     statusText = "Pending";
                 } else if (p.Status === "Overdue") {
-                    statusClass = "overdue";
+                    statusClass = "overdue"; // Red for Overdue
                     statusText = "Overdue";
                 } else if (p.Status === "Postponed") {
-                    statusClass = "postponed";
+                    statusClass = "postponed"; // Purple for Postponed
                     statusText = "Postponed";
                 }
 
@@ -351,14 +382,13 @@ function showPayments(day, month) {
                                 <p class="mb-1"><strong>Category:</strong> ${p.Category}</p>
                                 <p class="mb-1"><strong>Location:</strong> ${p.Location}</p>
                                 <p class="mb-1"><strong>Amount:</strong> ₱${p.Price}</p>
-                                 <p class="mb-1"><strong>Due Date:</strong> ${p.DueDate}</p>
                             </div>
                         </div>
                     </div>
                 `;
             });
 
-            details += '</div>';
+            details += '</div>'; // End of the row
         }
 
         $('#paymentInfo').html(details);
@@ -371,19 +401,8 @@ function showPayments(day, month) {
             $('#backToOverview').hide();
             $('#monthlyOverview').fadeIn();
         }
-
-
-function updateNotificationCount() {
-    $.get('get_notification_count.php', function(count) {
-        if (count > 0) {
-            $('#notifBell span').text(count).show();
-        } else {
-            $('#notifBell span').hide();
-        }
-    });
-}
-
-
+        
     </script>
+
 </body>
 </html>
