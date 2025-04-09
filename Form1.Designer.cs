@@ -30,6 +30,11 @@
         {
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.btnMarkAsPaid = new System.Windows.Forms.Button();
+            this.cmbFilterLocation = new System.Windows.Forms.ComboBox();
+            this.lblFilterLocation = new System.Windows.Forms.Label();
+            this.btnClear = new System.Windows.Forms.Button();
+            this.dgvPayments1 = new System.Windows.Forms.DataGridView();
             this.btnDelete = new System.Windows.Forms.Button();
             this.btnUpdate = new System.Windows.Forms.Button();
             this.btnSave = new System.Windows.Forms.Button();
@@ -53,19 +58,15 @@
             this.txtPaymentName = new System.Windows.Forms.TextBox();
             this.lblPaymentName = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.dgvPayments1 = new System.Windows.Forms.DataGridView();
-            this.btnClear = new System.Windows.Forms.Button();
-            this.cmbFilterLocation = new System.Windows.Forms.ComboBox();
-            this.lblFilterLocation = new System.Windows.Forms.Label();
-            this.btnMarkAsPaid = new System.Windows.Forms.Button();
             this.tabPaid = new System.Windows.Forms.TabPage();
             this.dgvPaidPayments = new System.Windows.Forms.DataGridView();
             this.tabUnpaid = new System.Windows.Forms.TabPage();
             this.dgvUnpaidPayments = new System.Windows.Forms.DataGridView();
+            this.btnAll = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numPrice)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvPayments1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numPrice)).BeginInit();
             this.tabPaid.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvPaidPayments)).BeginInit();
             this.tabUnpaid.SuspendLayout();
@@ -80,13 +81,15 @@
             this.tabControl1.Controls.Add(this.tabUnpaid);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
+            this.tabControl1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(1168, 450);
+            this.tabControl1.Size = new System.Drawing.Size(1557, 554);
             this.tabControl1.TabIndex = 0;
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.btnAll);
             this.tabPage1.Controls.Add(this.btnMarkAsPaid);
             this.tabPage1.Controls.Add(this.cmbFilterLocation);
             this.tabPage1.Controls.Add(this.lblFilterLocation);
@@ -114,19 +117,88 @@
             this.tabPage1.Controls.Add(this.lblPrice);
             this.tabPage1.Controls.Add(this.txtPaymentName);
             this.tabPage1.Controls.Add(this.lblPaymentName);
-            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Location = new System.Drawing.Point(4, 25);
+            this.tabPage1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(1160, 424);
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPage1.Size = new System.Drawing.Size(1549, 525);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Payment Entry";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
+            // btnMarkAsPaid
+            // 
+            this.btnMarkAsPaid.Location = new System.Drawing.Point(1313, 356);
+            this.btnMarkAsPaid.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnMarkAsPaid.Name = "btnMarkAsPaid";
+            this.btnMarkAsPaid.Size = new System.Drawing.Size(148, 28);
+            this.btnMarkAsPaid.TabIndex = 26;
+            this.btnMarkAsPaid.Text = "Mark as Paid";
+            this.btnMarkAsPaid.UseVisualStyleBackColor = true;
+            this.btnMarkAsPaid.Click += new System.EventHandler(this.btnMarkAsPaid_Click);
+            // 
+            // cmbFilterLocation
+            // 
+            this.cmbFilterLocation.FormattingEnabled = true;
+            this.cmbFilterLocation.Items.AddRange(new object[] {
+            "All",
+            "MANDAUE",
+            "TALISAY",
+            "DUMANJUG",
+            "MINGLANILLA",
+            "TOLEDO"});
+            this.cmbFilterLocation.Location = new System.Drawing.Point(807, 395);
+            this.cmbFilterLocation.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.cmbFilterLocation.Name = "cmbFilterLocation";
+            this.cmbFilterLocation.Size = new System.Drawing.Size(160, 24);
+            this.cmbFilterLocation.TabIndex = 25;
+            this.cmbFilterLocation.SelectedIndexChanged += new System.EventHandler(this.cmbFilterLocation_SelectedIndexChanged);
+            // 
+            // lblFilterLocation
+            // 
+            this.lblFilterLocation.AutoSize = true;
+            this.lblFilterLocation.Location = new System.Drawing.Point(803, 375);
+            this.lblFilterLocation.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.lblFilterLocation.Name = "lblFilterLocation";
+            this.lblFilterLocation.Size = new System.Drawing.Size(111, 16);
+            this.lblFilterLocation.TabIndex = 24;
+            this.lblFilterLocation.Text = "Filter by Location:";
+            // 
+            // btnClear
+            // 
+            this.btnClear.Location = new System.Drawing.Point(1109, 437);
+            this.btnClear.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnClear.Name = "btnClear";
+            this.btnClear.Size = new System.Drawing.Size(161, 28);
+            this.btnClear.TabIndex = 23;
+            this.btnClear.Text = "Clear forms";
+            this.btnClear.UseVisualStyleBackColor = true;
+            this.btnClear.Click += new System.EventHandler(this.btnClear_Click);
+            // 
+            // dgvPayments1
+            // 
+            this.dgvPayments1.AllowUserToAddRows = false;
+            this.dgvPayments1.AllowUserToDeleteRows = false;
+            this.dgvPayments1.AllowUserToResizeRows = false;
+            this.dgvPayments1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.dgvPayments1.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.Sunken;
+            this.dgvPayments1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvPayments1.Dock = System.Windows.Forms.DockStyle.Top;
+            this.dgvPayments1.Location = new System.Drawing.Point(4, 4);
+            this.dgvPayments1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.dgvPayments1.Name = "dgvPayments1";
+            this.dgvPayments1.ReadOnly = true;
+            this.dgvPayments1.RowHeadersWidth = 51;
+            this.dgvPayments1.Size = new System.Drawing.Size(1541, 185);
+            this.dgvPayments1.TabIndex = 22;
+            this.dgvPayments1.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvPayments1_CellClick);
+            // 
             // btnDelete
             // 
-            this.btnDelete.Location = new System.Drawing.Point(832, 325);
+            this.btnDelete.Location = new System.Drawing.Point(1109, 400);
+            this.btnDelete.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnDelete.Name = "btnDelete";
-            this.btnDelete.Size = new System.Drawing.Size(121, 23);
+            this.btnDelete.Size = new System.Drawing.Size(161, 28);
             this.btnDelete.TabIndex = 21;
             this.btnDelete.Text = "Delete";
             this.btnDelete.UseVisualStyleBackColor = true;
@@ -134,9 +206,10 @@
             // 
             // btnUpdate
             // 
-            this.btnUpdate.Location = new System.Drawing.Point(832, 296);
+            this.btnUpdate.Location = new System.Drawing.Point(1109, 364);
+            this.btnUpdate.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnUpdate.Name = "btnUpdate";
-            this.btnUpdate.Size = new System.Drawing.Size(121, 23);
+            this.btnUpdate.Size = new System.Drawing.Size(161, 28);
             this.btnUpdate.TabIndex = 20;
             this.btnUpdate.Text = "Update";
             this.btnUpdate.UseVisualStyleBackColor = true;
@@ -144,9 +217,10 @@
             // 
             // btnSave
             // 
-            this.btnSave.Location = new System.Drawing.Point(832, 267);
+            this.btnSave.Location = new System.Drawing.Point(1109, 329);
+            this.btnSave.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(121, 23);
+            this.btnSave.Size = new System.Drawing.Size(161, 28);
             this.btnSave.TabIndex = 19;
             this.btnSave.Text = "Save";
             this.btnSave.UseVisualStyleBackColor = true;
@@ -155,17 +229,19 @@
             // lblFilePath
             // 
             this.lblFilePath.AutoSize = true;
-            this.lblFilePath.Location = new System.Drawing.Point(829, 216);
+            this.lblFilePath.Location = new System.Drawing.Point(1105, 266);
+            this.lblFilePath.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblFilePath.Name = "lblFilePath";
-            this.lblFilePath.Size = new System.Drawing.Size(146, 13);
+            this.lblFilePath.Size = new System.Drawing.Size(180, 16);
             this.lblFilePath.TabIndex = 18;
             this.lblFilePath.Text = "(Shows the selected file path)";
             // 
             // btnUpload
             // 
-            this.btnUpload.Location = new System.Drawing.Point(832, 237);
+            this.btnUpload.Location = new System.Drawing.Point(1109, 292);
+            this.btnUpload.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.btnUpload.Name = "btnUpload";
-            this.btnUpload.Size = new System.Drawing.Size(121, 23);
+            this.btnUpload.Size = new System.Drawing.Size(161, 28);
             this.btnUpload.TabIndex = 17;
             this.btnUpload.Text = "Upload Proof";
             this.btnUpload.UseVisualStyleBackColor = true;
@@ -174,18 +250,20 @@
             // dtpPaidDate
             // 
             this.dtpPaidDate.Enabled = false;
-            this.dtpPaidDate.Location = new System.Drawing.Point(605, 261);
+            this.dtpPaidDate.Location = new System.Drawing.Point(807, 321);
+            this.dtpPaidDate.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.dtpPaidDate.Name = "dtpPaidDate";
-            this.dtpPaidDate.Size = new System.Drawing.Size(200, 20);
+            this.dtpPaidDate.Size = new System.Drawing.Size(265, 22);
             this.dtpPaidDate.TabIndex = 16;
             this.dtpPaidDate.Visible = false;
             // 
             // lblPaidDate
             // 
             this.lblPaidDate.AutoSize = true;
-            this.lblPaidDate.Location = new System.Drawing.Point(602, 245);
+            this.lblPaidDate.Location = new System.Drawing.Point(803, 302);
+            this.lblPaidDate.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblPaidDate.Name = "lblPaidDate";
-            this.lblPaidDate.Size = new System.Drawing.Size(134, 13);
+            this.lblPaidDate.Size = new System.Drawing.Size(171, 16);
             this.lblPaidDate.TabIndex = 15;
             this.lblPaidDate.Text = "Paid Date: Disabled initially";
             // 
@@ -197,18 +275,20 @@
             "Paid",
             "Overdue",
             "Postponed"});
-            this.cmbStatus.Location = new System.Drawing.Point(605, 212);
+            this.cmbStatus.Location = new System.Drawing.Point(807, 261);
+            this.cmbStatus.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.cmbStatus.Name = "cmbStatus";
-            this.cmbStatus.Size = new System.Drawing.Size(121, 21);
+            this.cmbStatus.Size = new System.Drawing.Size(160, 24);
             this.cmbStatus.TabIndex = 14;
             this.cmbStatus.SelectedIndexChanged += new System.EventHandler(this.cmbStatus_SelectedIndexChanged);
             // 
             // lblStatus
             // 
             this.lblStatus.AutoSize = true;
-            this.lblStatus.Location = new System.Drawing.Point(602, 196);
+            this.lblStatus.Location = new System.Drawing.Point(803, 241);
+            this.lblStatus.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblStatus.Name = "lblStatus";
-            this.lblStatus.Size = new System.Drawing.Size(40, 13);
+            this.lblStatus.Size = new System.Drawing.Size(47, 16);
             this.lblStatus.TabIndex = 13;
             this.lblStatus.Text = "Status:";
             // 
@@ -220,18 +300,20 @@
             "Monthly",
             "Quarterly",
             "Annually"});
-            this.cmbRecurringType.Location = new System.Drawing.Point(344, 355);
+            this.cmbRecurringType.Location = new System.Drawing.Point(459, 437);
+            this.cmbRecurringType.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.cmbRecurringType.Name = "cmbRecurringType";
-            this.cmbRecurringType.Size = new System.Drawing.Size(121, 21);
+            this.cmbRecurringType.Size = new System.Drawing.Size(160, 24);
             this.cmbRecurringType.TabIndex = 12;
             this.cmbRecurringType.Visible = false;
             // 
             // lblRecurringType
             // 
             this.lblRecurringType.AutoSize = true;
-            this.lblRecurringType.Location = new System.Drawing.Point(344, 336);
+            this.lblRecurringType.Location = new System.Drawing.Point(459, 414);
+            this.lblRecurringType.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblRecurringType.Name = "lblRecurringType";
-            this.lblRecurringType.Size = new System.Drawing.Size(83, 13);
+            this.lblRecurringType.Size = new System.Drawing.Size(103, 16);
             this.lblRecurringType.TabIndex = 11;
             this.lblRecurringType.Text = "Recurring Type:\n";
             this.lblRecurringType.Visible = false;
@@ -239,9 +321,10 @@
             // chkRecurring
             // 
             this.chkRecurring.AutoSize = true;
-            this.chkRecurring.Location = new System.Drawing.Point(344, 315);
+            this.chkRecurring.Location = new System.Drawing.Point(459, 388);
+            this.chkRecurring.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.chkRecurring.Name = "chkRecurring";
-            this.chkRecurring.Size = new System.Drawing.Size(78, 17);
+            this.chkRecurring.Size = new System.Drawing.Size(94, 20);
             this.chkRecurring.TabIndex = 10;
             this.chkRecurring.Text = "\tRecurring?";
             this.chkRecurring.UseVisualStyleBackColor = true;
@@ -249,17 +332,19 @@
             // 
             // dtpDueDate
             // 
-            this.dtpDueDate.Location = new System.Drawing.Point(344, 260);
+            this.dtpDueDate.Location = new System.Drawing.Point(459, 320);
+            this.dtpDueDate.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.dtpDueDate.Name = "dtpDueDate";
-            this.dtpDueDate.Size = new System.Drawing.Size(200, 20);
+            this.dtpDueDate.Size = new System.Drawing.Size(265, 22);
             this.dtpDueDate.TabIndex = 9;
             // 
             // lblDueDate
             // 
             this.lblDueDate.AutoSize = true;
-            this.lblDueDate.Location = new System.Drawing.Point(341, 245);
+            this.lblDueDate.Location = new System.Drawing.Point(455, 302);
+            this.lblDueDate.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblDueDate.Name = "lblDueDate";
-            this.lblDueDate.Size = new System.Drawing.Size(56, 13);
+            this.lblDueDate.Size = new System.Drawing.Size(67, 16);
             this.lblDueDate.TabIndex = 8;
             this.lblDueDate.Text = "Due Date:";
             // 
@@ -273,17 +358,19 @@
             "Loans",
             "SPP",
             "Credit Card"});
-            this.cmbCategory.Location = new System.Drawing.Point(344, 212);
+            this.cmbCategory.Location = new System.Drawing.Point(459, 261);
+            this.cmbCategory.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.cmbCategory.Name = "cmbCategory";
-            this.cmbCategory.Size = new System.Drawing.Size(121, 21);
+            this.cmbCategory.Size = new System.Drawing.Size(160, 24);
             this.cmbCategory.TabIndex = 7;
             // 
             // lblCategory
             // 
             this.lblCategory.AutoSize = true;
-            this.lblCategory.Location = new System.Drawing.Point(341, 196);
+            this.lblCategory.Location = new System.Drawing.Point(455, 241);
+            this.lblCategory.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblCategory.Name = "lblCategory";
-            this.lblCategory.Size = new System.Drawing.Size(52, 13);
+            this.lblCategory.Size = new System.Drawing.Size(65, 16);
             this.lblCategory.TabIndex = 6;
             this.lblCategory.Text = "Category:";
             // 
@@ -296,134 +383,82 @@
             "DUMANJUG",
             "MINGLANILLA",
             "TOLEDO"});
-            this.cmbLocation.Location = new System.Drawing.Point(102, 315);
+            this.cmbLocation.Location = new System.Drawing.Point(136, 388);
+            this.cmbLocation.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.cmbLocation.Name = "cmbLocation";
-            this.cmbLocation.Size = new System.Drawing.Size(121, 21);
+            this.cmbLocation.Size = new System.Drawing.Size(160, 24);
             this.cmbLocation.TabIndex = 5;
             // 
             // lblLocation
             // 
             this.lblLocation.AutoSize = true;
-            this.lblLocation.Location = new System.Drawing.Point(99, 299);
+            this.lblLocation.Location = new System.Drawing.Point(132, 368);
+            this.lblLocation.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblLocation.Name = "lblLocation";
-            this.lblLocation.Size = new System.Drawing.Size(51, 13);
+            this.lblLocation.Size = new System.Drawing.Size(61, 16);
             this.lblLocation.TabIndex = 4;
             this.lblLocation.Text = "Location:";
             // 
             // numPrice
             // 
             this.numPrice.DecimalPlaces = 2;
-            this.numPrice.Location = new System.Drawing.Point(102, 261);
+            this.numPrice.Location = new System.Drawing.Point(136, 321);
+            this.numPrice.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.numPrice.Maximum = new decimal(new int[] {
             100000000,
             0,
             0,
             0});
             this.numPrice.Name = "numPrice";
-            this.numPrice.Size = new System.Drawing.Size(120, 20);
+            this.numPrice.Size = new System.Drawing.Size(160, 22);
             this.numPrice.TabIndex = 3;
             // 
             // lblPrice
             // 
             this.lblPrice.AutoSize = true;
-            this.lblPrice.Location = new System.Drawing.Point(99, 245);
+            this.lblPrice.Location = new System.Drawing.Point(132, 302);
+            this.lblPrice.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblPrice.Name = "lblPrice";
-            this.lblPrice.Size = new System.Drawing.Size(31, 13);
+            this.lblPrice.Size = new System.Drawing.Size(38, 16);
             this.lblPrice.TabIndex = 2;
             this.lblPrice.Text = "Price";
             // 
             // txtPaymentName
             // 
-            this.txtPaymentName.Location = new System.Drawing.Point(102, 212);
+            this.txtPaymentName.Location = new System.Drawing.Point(136, 261);
+            this.txtPaymentName.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.txtPaymentName.Name = "txtPaymentName";
-            this.txtPaymentName.Size = new System.Drawing.Size(100, 20);
+            this.txtPaymentName.Size = new System.Drawing.Size(132, 22);
             this.txtPaymentName.TabIndex = 1;
             // 
             // lblPaymentName
             // 
             this.lblPaymentName.AutoSize = true;
-            this.lblPaymentName.Location = new System.Drawing.Point(99, 196);
+            this.lblPaymentName.Location = new System.Drawing.Point(132, 241);
+            this.lblPaymentName.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.lblPaymentName.Name = "lblPaymentName";
-            this.lblPaymentName.Size = new System.Drawing.Size(82, 13);
+            this.lblPaymentName.Size = new System.Drawing.Size(103, 16);
             this.lblPaymentName.TabIndex = 0;
             this.lblPaymentName.Text = "Payment Name:";
             // 
             // tabPage2
             // 
-            this.tabPage2.Location = new System.Drawing.Point(4, 22);
+            this.tabPage2.Location = new System.Drawing.Point(4, 25);
+            this.tabPage2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(1160, 424);
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPage2.Size = new System.Drawing.Size(1549, 525);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Payment List";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
-            // dgvPayments1
-            // 
-            this.dgvPayments1.AllowUserToAddRows = false;
-            this.dgvPayments1.AllowUserToDeleteRows = false;
-            this.dgvPayments1.AllowUserToResizeRows = false;
-            this.dgvPayments1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.dgvPayments1.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.Sunken;
-            this.dgvPayments1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvPayments1.Dock = System.Windows.Forms.DockStyle.Top;
-            this.dgvPayments1.Location = new System.Drawing.Point(3, 3);
-            this.dgvPayments1.Name = "dgvPayments1";
-            this.dgvPayments1.ReadOnly = true;
-            this.dgvPayments1.Size = new System.Drawing.Size(1154, 150);
-            this.dgvPayments1.TabIndex = 22;
-            this.dgvPayments1.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvPayments1_CellClick);
-            // 
-            // btnClear
-            // 
-            this.btnClear.Location = new System.Drawing.Point(832, 355);
-            this.btnClear.Name = "btnClear";
-            this.btnClear.Size = new System.Drawing.Size(121, 23);
-            this.btnClear.TabIndex = 23;
-            this.btnClear.Text = "Clear forms";
-            this.btnClear.UseVisualStyleBackColor = true;
-            this.btnClear.Click += new System.EventHandler(this.btnClear_Click);
-            // 
-            // cmbFilterLocation
-            // 
-            this.cmbFilterLocation.FormattingEnabled = true;
-            this.cmbFilterLocation.Items.AddRange(new object[] {
-            "MANDAUE",
-            "TALISAY",
-            "DUMANJUG",
-            "MINGLANILLA",
-            "TOLEDO"});
-            this.cmbFilterLocation.Location = new System.Drawing.Point(605, 321);
-            this.cmbFilterLocation.Name = "cmbFilterLocation";
-            this.cmbFilterLocation.Size = new System.Drawing.Size(121, 21);
-            this.cmbFilterLocation.TabIndex = 25;
-            this.cmbFilterLocation.SelectedIndexChanged += new System.EventHandler(this.cmbFilterLocation_SelectedIndexChanged);
-            // 
-            // lblFilterLocation
-            // 
-            this.lblFilterLocation.AutoSize = true;
-            this.lblFilterLocation.Location = new System.Drawing.Point(602, 305);
-            this.lblFilterLocation.Name = "lblFilterLocation";
-            this.lblFilterLocation.Size = new System.Drawing.Size(90, 13);
-            this.lblFilterLocation.TabIndex = 24;
-            this.lblFilterLocation.Text = "Filter by Location:";
-            // 
-            // btnMarkAsPaid
-            // 
-            this.btnMarkAsPaid.Location = new System.Drawing.Point(985, 289);
-            this.btnMarkAsPaid.Name = "btnMarkAsPaid";
-            this.btnMarkAsPaid.Size = new System.Drawing.Size(111, 23);
-            this.btnMarkAsPaid.TabIndex = 26;
-            this.btnMarkAsPaid.Text = "Mark as Paid";
-            this.btnMarkAsPaid.UseVisualStyleBackColor = true;
-            this.btnMarkAsPaid.Click += new System.EventHandler(this.btnMarkAsPaid_Click);
-            // 
             // tabPaid
             // 
             this.tabPaid.Controls.Add(this.dgvPaidPayments);
-            this.tabPaid.Location = new System.Drawing.Point(4, 22);
+            this.tabPaid.Location = new System.Drawing.Point(4, 25);
+            this.tabPaid.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.tabPaid.Name = "tabPaid";
-            this.tabPaid.Size = new System.Drawing.Size(1160, 424);
+            this.tabPaid.Size = new System.Drawing.Size(1549, 525);
             this.tabPaid.TabIndex = 2;
             this.tabPaid.Text = "Paid Payments";
             this.tabPaid.UseVisualStyleBackColor = true;
@@ -438,17 +473,20 @@
             this.dgvPaidPayments.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvPaidPayments.Dock = System.Windows.Forms.DockStyle.Top;
             this.dgvPaidPayments.Location = new System.Drawing.Point(0, 0);
+            this.dgvPaidPayments.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.dgvPaidPayments.Name = "dgvPaidPayments";
             this.dgvPaidPayments.ReadOnly = true;
-            this.dgvPaidPayments.Size = new System.Drawing.Size(1160, 150);
+            this.dgvPaidPayments.RowHeadersWidth = 51;
+            this.dgvPaidPayments.Size = new System.Drawing.Size(1549, 185);
             this.dgvPaidPayments.TabIndex = 23;
             // 
             // tabUnpaid
             // 
             this.tabUnpaid.Controls.Add(this.dgvUnpaidPayments);
-            this.tabUnpaid.Location = new System.Drawing.Point(4, 22);
+            this.tabUnpaid.Location = new System.Drawing.Point(4, 25);
+            this.tabUnpaid.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.tabUnpaid.Name = "tabUnpaid";
-            this.tabUnpaid.Size = new System.Drawing.Size(1160, 424);
+            this.tabUnpaid.Size = new System.Drawing.Size(1549, 525);
             this.tabUnpaid.TabIndex = 3;
             this.tabUnpaid.Text = "Unpaid Payments";
             this.tabUnpaid.UseVisualStyleBackColor = true;
@@ -463,24 +501,37 @@
             this.dgvUnpaidPayments.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvUnpaidPayments.Dock = System.Windows.Forms.DockStyle.Top;
             this.dgvUnpaidPayments.Location = new System.Drawing.Point(0, 0);
+            this.dgvUnpaidPayments.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.dgvUnpaidPayments.Name = "dgvUnpaidPayments";
             this.dgvUnpaidPayments.ReadOnly = true;
-            this.dgvUnpaidPayments.Size = new System.Drawing.Size(1160, 150);
+            this.dgvUnpaidPayments.RowHeadersWidth = 51;
+            this.dgvUnpaidPayments.Size = new System.Drawing.Size(1549, 185);
             this.dgvUnpaidPayments.TabIndex = 24;
+            // 
+            // btnAll
+            // 
+            this.btnAll.Location = new System.Drawing.Point(806, 437);
+            this.btnAll.Name = "btnAll";
+            this.btnAll.Size = new System.Drawing.Size(75, 23);
+            this.btnAll.TabIndex = 27;
+            this.btnAll.Text = "All";
+            this.btnAll.UseVisualStyleBackColor = true;
+            this.btnAll.Click += new System.EventHandler(this.btnAll_Click);
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1168, 450);
+            this.ClientSize = new System.Drawing.Size(1557, 554);
             this.Controls.Add(this.tabControl1);
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "Form1";
             this.Text = "Form1";
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.tabPage1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.numPrice)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvPayments1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numPrice)).EndInit();
             this.tabPaid.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dgvPaidPayments)).EndInit();
             this.tabUnpaid.ResumeLayout(false);
@@ -525,6 +576,7 @@
         private System.Windows.Forms.DataGridView dgvPaidPayments;
         private System.Windows.Forms.TabPage tabUnpaid;
         private System.Windows.Forms.DataGridView dgvUnpaidPayments;
+        private System.Windows.Forms.Button btnAll;
     }
 }
 

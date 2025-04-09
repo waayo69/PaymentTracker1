@@ -8,7 +8,7 @@ namespace PaymentTracker1
 {
     public partial class Form1 : Form
     {
-        private string connectionString = @"Data Source=sql.bsite.net\MSSQL2016;Initial Catalog=waayo69_Clients;User ID=waayo69_Clients;Password=kris123asd;Encrypt=False; Connection Timeout=30";
+        private string connectionString = @"Data Source=db17019.public.databaseasp.net; Database=db17019; User Id=db17019; Password=Y+p5h4?X6Fk!; Encrypt=False; MultipleActiveResultSets=True;";
 
         public Form1()
         {
@@ -69,8 +69,9 @@ namespace PaymentTracker1
             }
 
             // Bind to DataGridViews
-            dgvPaidPayments.DataSource = unpaidTable; // Unpaid Payments in Tab 1
+            dgvUnpaidPayments.DataSource = unpaidTable; // Unpaid Payments in Tab 1
             dgvPaidPayments.DataSource = paidTable; // Paid Payments in Tab 2
+            dgvPayments1.DataSource = dt; // All Payments in Tab 3
         }
 
 
@@ -218,6 +219,10 @@ namespace PaymentTracker1
                 string selectedLocation = cmbFilterLocation.SelectedItem.ToString();
                 (dgvPayments1.DataSource as DataTable).DefaultView.RowFilter = $"Location = '{selectedLocation}'";
             }
+            if (cmbFilterLocation.SelectedItem == "All")
+            {
+                LoadPayments();
+            }
         }
 
 
@@ -320,6 +325,11 @@ namespace PaymentTracker1
                     MessageBox.Show("This is not a recurring payment.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
+        }
+
+        private void btnAll_Click(object sender, EventArgs e)
+        {
+            LoadPayments();
         }
     }
 }
