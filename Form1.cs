@@ -69,7 +69,7 @@ namespace PaymentTracker1
             }
 
             // Bind to DataGridViews
-            dgvPaidPayments.DataSource = unpaidTable; // Unpaid Payments in Tab 1
+            dgvPayments1.DataSource = unpaidTable; // Unpaid Payments in Tab 1
             dgvPaidPayments.DataSource = paidTable; // Paid Payments in Tab 2
         }
 
