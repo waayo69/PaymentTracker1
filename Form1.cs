@@ -74,7 +74,39 @@ namespace PaymentTracker1
             dgvUnpaidPayments.DataSource = unpaidTable;
         }
 
-      
+        private void ApplyStatusFilter()
+        {
+            if (cboFilter.SelectedItem != null)
+            {
+                string selectedStatus = cboFilter.SelectedItem.ToString();
+                string filterExpression = "";
+
+                switch (selectedStatus)
+                {
+                    case "All":
+                        filterExpression = "";
+                        break;
+                    case "Paid":
+                        filterExpression = "Status = 'Paid'";
+                        break;
+                    case "Unpaid":
+                        filterExpression = "Status = 'Unpaid'";
+                        break;
+                    case "Overdue":
+                        filterExpression = "DisplayStatus = 'Overdue'";
+                        break;
+                    case "Postponed":
+                        filterExpression = "Status = 'Postponed'"; // Assuming you have a 'Postponed' status
+                        break;
+                }
+
+                // Apply the filter to the single DataGridView (dgvPayments1)
+                if (dgvPayments1.DataSource is DataTable dt)
+                {
+                    dt.DefaultView.RowFilter = filterExpression;
+                }
+            }
+        }
 
 
         private void MarkAsPaid(int paymentId, DateTime dueDate, bool isRecurring, string recurringType)
@@ -323,6 +355,11 @@ namespace PaymentTracker1
                     MessageBox.Show("This is not a recurring payment.", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
+        }
+
+        private void cboFilter_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ApplyStatusFilter();
         }
         private void ApplyStatusFilter()
         {
